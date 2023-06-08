@@ -7,6 +7,14 @@
     <head>
         <title>Lista trabajos</title>
         <jsp:include page="../includes/headCss.jsp"></jsp:include>
+        <!-- esto es opcional, no entra en el curso! -->
+        <script src="https://code.jquery.com/jquery-3.7.0.min.js"
+                integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+        <script>
+            $(document).ready(function(){
+               $("#mensaje").delay(2000).hide(2000);
+            });
+        </script>
     </head>
     <body>
         <div class='container'>
@@ -22,10 +30,15 @@
                         nuevo Trabajo</a>
                 </div>
             </div>
-            <% if (request.getParameter("msg") != null) {%>
-            <div class="alert alert-success" role="alert"><%=request.getParameter("msg")%>
+            <% if (session.getAttribute("msg") != null) {
+                //if (request.getParameter("msg") != null) {%>
+            <div id="mensaje" class="alert alert-success" role="alert">
+                <%=session.getAttribute("msg")%>
             </div>
-            <% } %>
+            <%
+                    session.setAttribute("msg", null);
+                }
+            %>
             <% if (request.getParameter("err") != null) {%>
             <div class="alert alert-danger" role="alert"><%=request.getParameter("err")%>
             </div>

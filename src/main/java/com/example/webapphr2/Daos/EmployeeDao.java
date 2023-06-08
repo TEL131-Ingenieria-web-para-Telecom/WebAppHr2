@@ -4,6 +4,7 @@ package com.example.webapphr2.Daos;
 import com.example.webapphr2.Beans.Department;
 import com.example.webapphr2.Beans.Employee;
 import com.example.webapphr2.Beans.Job;
+import com.example.webapphr2.Dtos.EmpleadosPorRegionDto;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -98,7 +99,7 @@ public class EmployeeDao extends DaoBase {
         }
     }
 
-    public ArrayList<Employee> buscarEmpleadosPorNombre(String name){
+    public ArrayList<Employee> buscarEmpleadosPorNombre(String name) {
 
         ArrayList<Employee> listaEmpleados = new ArrayList<>();
 
@@ -177,5 +178,61 @@ public class EmployeeDao extends DaoBase {
         department.setDepartmentId(rs.getInt(11));
         department.setDepartmentName(rs.getString("d.department_name"));
         employee.setDepartment(department);
+    }
+
+    public Employee validateUsernameAndPassword(String username, String password) {
+
+        Employee employee = null;
+
+        String sql = "SELECT * FROM employees e \n" +
+                "inner join employees_credentials ec on ec.employee_id = e.employee_id \n" +
+                "where ec.email = ? and ec.password_hashed = sha2(?,256)";
+
+        try (Connection connection = getConection();
+             PreparedStatement pstmt = connection.prepareStatement(sql)) {
+
+            pstmt.setString(1, username);
+            pstmt.setString(2, password);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+
+                if (rs.next()) {
+                    employee = obtenerEmpleado(rs.getInt(1));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return employee;
+    }
+
+    public ArrayList<EmpleadosPorRegionDto> listarEmpleadosPorRegion() {
+
+        ArrayList<EmpleadosPorRegionDto> lista = new ArrayList<>();
+
+        String sql = "select r.region_name, count(c.country_id) as '# empleados'\n" +
+                "from employees e\n" +
+                "inner join departments d on (e.department_id = d.department_id)\n" +
+                "inner join locations l on (l.location_id = d.location_id)\n" +
+                "inner join countries c on (c.country_id = l.country_id)\n" +
+                "inner join regions r on (c.region_id = r.region_id)\n" +
+                "group by r.region_id";
+
+        try (Connection connection = getConection();
+             Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                EmpleadosPorRegionDto e = new EmpleadosPorRegionDto();
+                e.setRegion(rs.getString(1));
+                e.setCantidad(rs.getInt(2));
+                lista.add(e);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return lista;
     }
 }

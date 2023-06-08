@@ -95,6 +95,10 @@ public class EmployeeServlet extends HttpServlet {
                     response.sendRedirect("EmployeeServlet?err=Error al borrar el empleado");
                 }
                 break;
+            case "est":
+                request.setAttribute("lista", employeeDao.listarEmpleadosPorRegion());
+                request.getRequestDispatcher("employees/empXregion.jsp").forward(request, response);
+                break;
             default:
                 response.sendRedirect("EmployeeServlet");
         }
@@ -154,7 +158,7 @@ public class EmployeeServlet extends HttpServlet {
                 if (textoBuscar == null) {
                     response.sendRedirect("EmployeeServlet");
                 } else {
-                    request.setAttribute("textoBusqueda",textoBuscar);
+                    request.setAttribute("textoBusqueda", textoBuscar);
                     request.setAttribute("listaEmpleados", employeeDao.buscarEmpleadosPorNombre(textoBuscar));
                     RequestDispatcher view = request.getRequestDispatcher("employees/lista.jsp");
                     view.forward(request, response);

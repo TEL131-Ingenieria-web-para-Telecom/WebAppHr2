@@ -1,4 +1,6 @@
 <% String currentPage = request.getParameter("currentPage"); %>
+<jsp:useBean id="usuarioLog" scope="session" type="com.example.webapphr2.Beans.Employee"
+             class="com.example.webapphr2.Beans.Employee"/>
 
 <nav class="navbar navbar-expand-md navbar-light bg-light">
     <div class="container-fluid">
@@ -21,6 +23,19 @@
                         Jobs
                     </a>
                 </li>
+                <li class="nav-item <%=currentPage.equals("est") ? "active" : ""%>">
+                    <a class="nav-link" href="<%=request.getContextPath()%>/EmployeeServlet?action=est">Estadísticas</a>
+                </li>
+                <div class="form-inline font-italic my-2 my-lg-0">
+                    <% if (usuarioLog.getEmployeeId() > 0) { //esto logueado %>
+                    <span><%=usuarioLog.getFirstName() + " " + usuarioLog.getLastName()%></span><a
+                        href="<%=request.getContextPath()%>/login?action=logout">(Cerrar sesión)</a>
+                    <% } else { //no estoy loggedIn %>
+                    <a class="nav-link" style="color: #007bff;" href="<%=request.getContextPath()%>/login">
+                        (Iniciar Sesión)
+                    </a>
+                    <% } %>
+                </div>
             </ul>
         </div>
     </div>
